@@ -9,7 +9,8 @@ MID_POINT_SCREEN = (int(WIDTH / 2), int(HEIGHT / 2))
 
 # Colors
 RED = (255, 0, 0)
-BLACK = (255, 255, 255)
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
