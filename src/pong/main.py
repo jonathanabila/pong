@@ -1,3 +1,4 @@
+import random
 from abc import ABC, abstractmethod
 
 import pygame
@@ -7,7 +8,7 @@ HEIGHT = 600
 WIDTH = 800
 
 # Game Speed
-FPS = 240
+FPS = 144
 
 # Components
 LINE_WIDTH = 3
@@ -54,15 +55,29 @@ class Component(BaseComponent):
 
 
 class Ball(Component):
-    def __init__(self):
-        x, y = get_middle_screen()
+    def __init__(self, direction=(None, None)):
+        x, y = None, None
+        self.direction = direction
         super().__init__(x, y)
 
-    def draw(self):
+    @property
+    def _start_position(self):
         x, y = get_middle_screen()
         center_x, center_y = x - BALL_SIZE // 2, y - BALL_SIZE // 2
+        return center_x, center_y
 
-        pygame.draw.rect(screen, WHITE, (center_x, center_y, BALL_SIZE, BALL_SIZE))
+    def move(self):
+        d_choices = [-1, 1]
+        if self.direction == (None, None):
+            self.direction = (random.choice(d_choices), random.choice(d_choices))
+        else:
+            d_x, d_y = self.direction
+            self.x, self.y = self.x + d_x, self.y + d_y
+
+    def draw(self):
+        if not self.x and not self.y:
+            self.x, self.y = self._start_position
+        pygame.draw.rect(screen, WHITE, (self.x, self.y, BALL_SIZE, BALL_SIZE))
 
 
 class Field(BaseComponent):
@@ -120,6 +135,8 @@ class Game(BaseComponent):
         self.player_2 = Player(right_side=True)
 
     def draw(self):
+        self.ball.move()
+
         self.field.draw()
         self.player_1.draw()
         self.player_2.draw()
