@@ -45,23 +45,43 @@ def get_middle_screen():
 
 class BaseComponent(ABC):
     @abstractmethod
-    def draw(self):
+    def draw(self, *args, **kwargs):
         pass
 
 
-class Component(BaseComponent):
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-
-
-class Ball(Component):
-    def __init__(self, direction=(None, None)):
-        x, y = None, None
-        self.direction = direction
-        super().__init__(x, y)
+class Rect(BaseComponent):
+    def __init__(self, x, y, width, height):
+        self.rect = pygame.Rect(x, y, width, height)
 
     @property
-    def _start_position(self):
+    def x(self):
+        return self.rect.x
+
+    @x.setter
+    def x(self, value):
+        self.rect.x = value
+
+    @property
+    def y(self):
+        return self.rect.y
+
+    @y.setter
+    def y(self, value):
+        self.rect.y = value
+
+    def draw(self, color):
+        pygame.draw.rect(screen, color, self.rect)
+
+
+class Ball(Rect):
+    def __init__(self, direction=(None, None)):
+        self.direction = direction
+
+        x, y = self._start_position()
+        super().__init__(x, y, BALL_SIZE, BALL_SIZE)
+
+    @staticmethod
+    def _start_position():
         x, y = get_middle_screen()
         center_x, center_y = x - BALL_SIZE // 2, y - BALL_SIZE // 2
         return center_x, center_y
@@ -74,10 +94,10 @@ class Ball(Component):
             d_x, d_y = self.direction
             self.x, self.y = self.x + d_x, self.y + d_y
 
-    def draw(self):
+    def draw(self, *args, **kwargs):
         if not self.x and not self.y:
             self.x, self.y = self._start_position
-        pygame.draw.rect(screen, WHITE, (self.x, self.y, BALL_SIZE, BALL_SIZE))
+        super().draw(WHITE)
 
 
 class Field(BaseComponent):
@@ -96,13 +116,12 @@ class Field(BaseComponent):
         self._draw_mid_line()
 
 
-class Player(Component):
+class Player(Rect):
     def __init__(self, right_side=False):
         self.right_side = right_side
 
         x, y = self._get_start_position()
-
-        super().__init__(x, y)
+        super().__init__(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
 
     def _get_player_side(self):
         if self.right_side:
@@ -116,12 +135,8 @@ class Player(Component):
 
         return x, center_y - PLAYER_HEIGHT // 2
 
-    def _get_player_position(self):
-        return (self.x, self.y), (self.x, self.y + PLAYER_HEIGHT)
-
-    def draw(self):
-        start, end = self._get_player_position()
-        pygame.draw.line(screen, WHITE, start, end, PLAYER_WIDTH)
+    def draw(self, *args, **kwargs):
+        super().draw(WHITE)
 
 
 class Game(BaseComponent):
