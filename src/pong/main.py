@@ -214,9 +214,8 @@ class Game(BaseComponent):
 
     def hit_player(self, player):
         return (
-            player.right == self.ball.left
-            and player.bottom <= self.ball.center_y <= player.top
-        )
+            player.right == self.ball.left or player.left == self.ball.right
+        ) and player.bottom >= self.ball.center_y >= player.top
 
     def hit_border(self, x_border):
         return self.ball.left == x_border or self.ball.right == x_border
