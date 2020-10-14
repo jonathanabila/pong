@@ -91,6 +91,26 @@ class Rect(BaseComponent):
     def center_y(self):
         return self.rect.centery
 
+    @center_y.setter
+    def center_y(self, value):
+        self.rect.centery = value
+
+    @property
+    def center_x(self):
+        return self.rect.centerx
+
+    @center_x.setter
+    def center_x(self, value):
+        self.rect.centerx = value
+
+    @property
+    def center(self):
+        return self.rect.center
+
+    @center.setter
+    def center(self, value):
+        self.rect.center = value
+
     def draw(self, color):
         pygame.draw.rect(screen, color, self.rect)
 
@@ -206,7 +226,13 @@ class Game(BaseComponent):
         self.player_2 = Player(right_side=True)
 
     def reset(self):
-        pass
+        center_x, center_y = get_middle_screen()
+
+        self.player_1.center_y = center_y
+        self.player_2.center_y = center_y
+
+        self.ball.direction = (None, None)
+        self.ball.center = center_x, center_y
 
     def score_a_point(self, player):
         player.score += 1
@@ -231,8 +257,10 @@ class Game(BaseComponent):
 
         if self.hit_border(X_START):
             self.score_a_point(self.player_2)
+            self.reset()
         elif self.hit_border(WIDTH):
             self.score_a_point(self.player_1)
+            self.reset()
 
     def _check_collisions(self):
         self._check_field_collisions()
