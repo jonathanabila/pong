@@ -94,6 +94,10 @@ class Rect(BaseComponent):
     def draw(self, color):
         pygame.draw.rect(screen, color, self.rect)
 
+    @abstractmethod
+    def move(self):
+        pass
+
 
 class Ball(Rect):
     def __init__(self, direction=(None, None)):
@@ -128,6 +132,12 @@ class Ball(Rect):
         if not self.x and not self.y:
             self.x, self.y = self._start_position
         super().draw(WHITE)
+
+    def check_collision(self):
+        if self.top == 0:
+            self.change_y_direction()
+        elif self.bottom == HEIGHT:
+            self.change_y_direction()
 
 
 class Field(BaseComponent):
@@ -172,6 +182,18 @@ class Player(Rect):
     def draw(self, *args, **kwargs):
         super().draw(WHITE)
 
+    def move(self, up=False):
+        if up:
+            direction = -1
+            if self.top == 0:
+                return
+        else:
+            direction = 1
+            if self.bottom == HEIGHT:
+                return
+
+        self.y += direction
+
 
 class Game(BaseComponent):
     def __init__(self):
@@ -206,10 +228,7 @@ class Game(BaseComponent):
             self.ball.change_x_direction()
 
     def _check_field_collisions(self):
-        if self.ball.top == 0:
-            self.ball.change_y_direction()
-        elif self.ball.bottom == HEIGHT:
-            self.ball.change_y_direction()
+        self.ball.check_collision()
 
         if self.hit_border(X_START):
             self.score_a_point(self.player_2)
@@ -233,6 +252,13 @@ class Game(BaseComponent):
         self.player_2.draw()
         self.ball.draw()
 
+    def handle_event(self):
+        key = pygame.key.get_pressed()
+        if key[pygame.K_w]:
+            self.player_1.move(up=True)
+        elif key[pygame.K_s]:
+            self.player_1.move(up=False)
+
 
 def main():
     pygame.init()
@@ -246,6 +272,7 @@ def main():
 
         screen.fill(BLACK)
         game.draw()
+        game.handle_event()
         pygame.display.update()
         clock.tick(FPS)
 
