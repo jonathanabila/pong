@@ -238,6 +238,25 @@ class Game(BaseComponent):
         self._check_field_collisions()
         self._check_player_collisions()
 
+    def ai_player(self):
+        d_x, _ = self.ball.direction
+        _, center_y = get_middle_screen()
+
+        if center_y == self.player_2.center_y and d_x != 1:
+            return
+
+        if d_x == 1:
+            if self.ball.center_y > self.player_2.bottom:
+                self.player_2.move(up=False)
+            else:
+                self.player_2.move(up=True)
+        else:
+
+            if self.player_2.center_y > center_y:
+                self.player_2.move(up=True)
+            else:
+                self.player_2.move(up=False)
+
     def draw(self):
         # Check collisions before making any movement
         self._check_collisions()
@@ -250,6 +269,9 @@ class Game(BaseComponent):
         self.player_1.draw()
         self.player_2.draw()
         self.ball.draw()
+
+        # Make AI player with player 2
+        self.ai_player()
 
     def handle_event(self):
         key = pygame.key.get_pressed()
