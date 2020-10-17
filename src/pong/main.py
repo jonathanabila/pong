@@ -249,16 +249,27 @@ class Game(BaseComponent):
         player.score += 1
         self.reset()
 
-    def hit_player(self, player):
-        return (
-            player.right == self.ball.left or player.left == self.ball.right
-        ) and player.bottom >= self.ball.center_y >= player.top
+    def hit_player(self, player, left_player=False):
+        if (
+            left_player
+            and player.right == self.ball.left
+            and player.bottom >= self.ball.center_y >= player.top
+        ):
+            return True
+        elif (
+            not left_player
+            and player.left == self.ball.right
+            and player.bottom >= self.ball.center_y >= player.top
+        ):
+            return True
+
+        return False
 
     def hit_border(self, x_border):
         return self.ball.left == x_border or self.ball.right == x_border
 
     def _check_player_collisions(self):
-        if self.hit_player(self.player_1):
+        if self.hit_player(self.player_1, left_player=True):
             self.player_1.hits += 1
             self.ball.change_x_direction()
         elif self.hit_player(self.player_2):
