@@ -9,6 +9,10 @@ WIDTH = 800
 
 X_START = 0
 
+# Font Configuration
+FONT_SIZE = 20
+FONT_STYLE = "freesansbold.ttf"
+
 # Game Speed
 FPS = 144
 HITS_TO_INCREASE_SPEED = 10
@@ -122,6 +126,24 @@ class Rect(BaseComponent):
         pass
 
 
+class ScoreBoard(BaseComponent):
+    def __init__(self):
+        self.font = pygame.font.Font(FONT_STYLE, FONT_SIZE)
+
+    @staticmethod
+    def _get_score_position():
+        center_x, _ = get_middle_screen()
+        x = (center_x + WIDTH) // 2
+        return x, FIELD_PADDING
+
+    def draw(self, score):
+        text = self.font.render(f"Placar = {score}", True, WHITE)
+
+        score_pos = self._get_score_position()
+        text_rect = text.get_rect(center=score_pos)
+        screen.blit(text, text_rect)
+
+
 class Ball(Rect):
     def __init__(self, direction=(None, None)):
         self.direction = direction
@@ -223,6 +245,7 @@ class Game(BaseComponent):
     def __init__(self):
         # Settings
         self.speed = FPS
+        self.score_board = ScoreBoard()
 
         # Field
         self.field = Field()
@@ -314,6 +337,9 @@ class Game(BaseComponent):
             self.player_1.hits = 0
 
     def draw(self):
+        # Draw ScoreBoard
+        self.score_board.draw(self.player_1.score)
+
         # Check collisions before making any movement
         self._check_collisions()
         self._check_speed_increase()
