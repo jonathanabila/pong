@@ -215,7 +215,7 @@ class Player(Rect):
 
     def _load_sound(self):
         if pygame.mixer.get_init():
-            self.sound = pygame.mixer.Sound("./pong/sounds/player.mp3")
+            self.sound = pygame.mixer.Sound("./pong/sounds/player.wav")
 
     def score_point(self):
         self.score += 1
@@ -265,6 +265,28 @@ class Game(BaseComponent):
         # Players
         self.player_1 = Player()
         self.player_2 = Player(right_side=True)
+
+        self.victory_sound = None
+        self.defeat_sound = None
+        self.points_sound = None
+
+    def _load_sounds(self):
+        if pygame.mixer.get_init():
+            self.victory_sound = pygame.mixer.Sound("./pong/sounds/victory.wav")
+            self.defeat_sound = pygame.mixer.Sound("./pong/sounds/defeat.wav")
+            self.points_sound = pygame.mixer.Sound("./pong/sounds/points.wav")
+
+    def play_victory(self):
+        if self.victory_sound:
+            self.victory_sound.play()
+
+    def play_defeat(self):
+        if self.defeat_sound:
+            self.defeat_sound.play()
+
+    def play_points(self):
+        if self.points_sound:
+            self.points_sound.play()
 
     def reset(self):
         center_x, center_y = get_middle_screen()
@@ -316,8 +338,10 @@ class Game(BaseComponent):
         self.ball.check_collision()
 
         if self.hit_border(X_START):
+            self.play_victory()
             self.score_hit_hall(self.player_2)
         elif self.hit_border(WIDTH):
+            self.play_defeat()
             self.score_hit_hall(self.player_1, 10)
 
     def _check_collisions(self):
@@ -337,7 +361,6 @@ class Game(BaseComponent):
             else:
                 self.player_2.move(up=True)
         else:
-
             if self.player_2.center_y > center_y:
                 self.player_2.move(up=True)
             else:
