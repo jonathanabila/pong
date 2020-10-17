@@ -268,8 +268,8 @@ class Game(BaseComponent):
 
         self.speed = FPS
 
-    def score_a_point(self, player):
-        player.score += 1
+    def score_hit_hall(self, player, points=1):
+        player.score += points
         self.reset()
 
     def hit_player(self, player, left_player=False):
@@ -294,6 +294,7 @@ class Game(BaseComponent):
     def _check_player_collisions(self):
         if self.hit_player(self.player_1, left_player=True):
             self.player_1.hits += 1
+            self.player_1.score_point()
             self.ball.change_x_direction()
         elif self.hit_player(self.player_2):
             self.ball.change_x_direction()
@@ -302,11 +303,9 @@ class Game(BaseComponent):
         self.ball.check_collision()
 
         if self.hit_border(X_START):
-            self.score_a_point(self.player_2)
-            self.reset()
+            self.score_hit_hall(self.player_2)
         elif self.hit_border(WIDTH):
-            self.score_a_point(self.player_1)
-            self.reset()
+            self.score_hit_hall(self.player_1, 10)
 
     def _check_collisions(self):
         self._check_field_collisions()
@@ -331,10 +330,16 @@ class Game(BaseComponent):
             else:
                 self.player_2.move(up=False)
 
+    def _check_speed_increase_score(self):
+        if self.speed > FPS and self.speed % 2 == 0:
+            self.player_1.score_point()
+
     def _check_speed_increase(self):
         if self.player_1.hits > 0 and self.player_1.hits % HITS_TO_INCREASE_SPEED == 0:
             self.speed += SPEED_INCREASE
             self.player_1.hits = 0
+
+            self._check_speed_increase_score()
 
     def draw(self):
         # Draw ScoreBoard
