@@ -207,8 +207,15 @@ class Player(Rect):
         self.score = 0
         self.hits = 0
 
+        self.sound = None
+
         x, y = self._get_start_position()
+        self._load_sound()
         super().__init__(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
+
+    def _load_sound(self):
+        if pygame.mixer.get_init():
+            self.sound = pygame.mixer.Sound("./pong/sounds/player.mp3")
 
     def score_point(self):
         self.score += 1
@@ -239,6 +246,10 @@ class Player(Rect):
                 return
 
         self.y += direction
+
+    def play_sound(self):
+        if self.sound:
+            self.sound.play()
 
 
 class Game(BaseComponent):
@@ -278,12 +289,14 @@ class Game(BaseComponent):
             and player.right == self.ball.left
             and player.bottom >= self.ball.center_y >= player.top
         ):
+            player.play_sound()
             return True
         elif (
             not left_player
             and player.left == self.ball.right
             and player.bottom >= self.ball.center_y >= player.top
         ):
+            player.play_sound()
             return True
 
         return False
@@ -369,8 +382,17 @@ class Game(BaseComponent):
             self.player_1.move(up=False)
 
 
+def _load_mixer():
+    try:
+        pygame.mixer.pre_init()
+        pygame.mixer.init()
+    except pygame.error:
+        print("Starting without sounds")
+
+
 def main():
     pygame.init()
+    _load_mixer()
     clock = pygame.time.Clock()
     game = Game()
 
