@@ -11,6 +11,9 @@ X_START = 0
 
 # Game Speed
 FPS = 144
+HITS_TO_INCREASE_SPEED = 10
+
+SPEED_INCREASE = 1
 
 # Components
 LINE_WIDTH = 3
@@ -180,6 +183,7 @@ class Player(Rect):
     def __init__(self, right_side=False):
         self.right_side = right_side
         self.score = 0
+        self.hits = 0
 
         x, y = self._get_start_position()
         super().__init__(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
@@ -217,6 +221,9 @@ class Player(Rect):
 
 class Game(BaseComponent):
     def __init__(self):
+        # Settings
+        self.speed = FPS
+
         # Field
         self.field = Field()
         self.ball = Ball()
@@ -229,10 +236,14 @@ class Game(BaseComponent):
         center_x, center_y = get_middle_screen()
 
         self.player_1.center_y = center_y
+        self.player_1.hits = 0
+
         self.player_2.center_y = center_y
 
         self.ball.direction = (None, None)
         self.ball.center = center_x, center_y
+
+        self.speed = FPS
 
     def score_a_point(self, player):
         player.score += 1
@@ -248,6 +259,7 @@ class Game(BaseComponent):
 
     def _check_player_collisions(self):
         if self.hit_player(self.player_1):
+            self.player_1.hits += 1
             self.ball.change_x_direction()
         elif self.hit_player(self.player_2):
             self.ball.change_x_direction()
@@ -285,9 +297,15 @@ class Game(BaseComponent):
             else:
                 self.player_2.move(up=False)
 
+    def _check_speed_increase(self):
+        if self.player_1.hits > 0 and self.player_1.hits % HITS_TO_INCREASE_SPEED == 0:
+            self.speed += SPEED_INCREASE
+            self.player_1.hits = 0
+
     def draw(self):
         # Check collisions before making any movement
         self._check_collisions()
+        self._check_speed_increase()
 
         # Moves the ball
         self.ball.move()
@@ -323,7 +341,7 @@ def main():
         game.draw()
         game.handle_event()
         pygame.display.update()
-        clock.tick(FPS)
+        clock.tick(game.speed)
 
     pygame.display.quit()
     pygame.quit()
