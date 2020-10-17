@@ -209,6 +209,8 @@ class Player(Rect):
 
         self.sound = None
 
+        self.sound_score_played = False
+
         x, y = self._get_start_position()
         self._load_sound()
         super().__init__(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
@@ -377,6 +379,13 @@ class Game(BaseComponent):
 
             self._check_speed_increase_score()
 
+    def _check_score_sound(self):
+        if self.player_1.score % 10 == 0 and not self.player_1.sound_score_played:
+            self.play_points()
+            self.player_1.sound_score_played = True
+        else:
+            self.player_1.sound_score_played = False
+
     def draw(self):
         # Draw ScoreBoard
         self.score_board.draw(self.player_1.score)
@@ -384,6 +393,9 @@ class Game(BaseComponent):
         # Check collisions before making any movement
         self._check_collisions()
         self._check_speed_increase()
+
+        # Check score points
+        self._check_score_sound()
 
         # Moves the ball
         self.ball.move()
