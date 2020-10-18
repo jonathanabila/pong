@@ -272,6 +272,8 @@ class Game(BaseComponent):
         self.defeat_sound = None
         self.points_sound = None
 
+        self._load_sounds()
+
     def _load_sounds(self):
         if pygame.mixer.get_init():
             self.victory_sound = pygame.mixer.Sound("./pong/sounds/victory.wav")
@@ -380,10 +382,17 @@ class Game(BaseComponent):
             self._check_speed_increase_score()
 
     def _check_score_sound(self):
-        if self.player_1.score % 10 == 0 and not self.player_1.sound_score_played:
+        if (
+            self.player_1.score > 0
+            and self.player_1.score % HITS_TO_INCREASE_SPEED == 0
+            and not self.player_1.sound_score_played
+        ):
             self.play_points()
             self.player_1.sound_score_played = True
-        else:
+        elif (
+            self.player_1.score > 0
+            and self.player_1.score % HITS_TO_INCREASE_SPEED != 0
+        ):
             self.player_1.sound_score_played = False
 
     def draw(self):
