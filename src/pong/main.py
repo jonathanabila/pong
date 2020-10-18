@@ -340,10 +340,10 @@ class Game(BaseComponent):
         self.ball.check_collision()
 
         if self.hit_border(X_START):
-            self.play_victory()
+            self.play_defeat()
             self.score_hit_hall(self.player_2)
         elif self.hit_border(WIDTH):
-            self.play_defeat()
+            self.play_victory()
             self.score_hit_hall(self.player_1, 10)
 
     def _check_collisions(self):
