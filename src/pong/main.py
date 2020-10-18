@@ -305,6 +305,10 @@ class Game(BaseComponent):
 
         self.speed = FPS
 
+    def restart(self):
+        self.player_1.score = 0
+        self.reset()
+
     def score_hit_hall(self, player, points=1):
         player.score += points
         self.reset()
@@ -343,7 +347,7 @@ class Game(BaseComponent):
 
         if self.hit_border(X_START):
             self.play_defeat()
-            self.score_hit_hall(self.player_2)
+            self.restart()
         elif self.hit_border(WIDTH):
             self.play_victory()
             self.score_hit_hall(self.player_1, 10)
